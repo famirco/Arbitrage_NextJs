@@ -1,12 +1,11 @@
 module.exports = {
   apps: [{
     name: 'arbitrage-frontend',
-    script: 'node_modules/next/dist/bin/next',
-    args: 'start',
+    script: '.next/standalone/server.js',
     env: {
-      PORT: 80,
+      PORT: 3000,
       NODE_ENV: 'production',
-      NEXT_PUBLIC_API_URL: 'https://amirez.info'
+      NEXT_PUBLIC_API_URL: 'https://amirez.info/api'
     }
   }]
 }
