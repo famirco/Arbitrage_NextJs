@@ -1,20 +1,23 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import logger from '../utils/logger';
 
 const prisma = new PrismaClient();
 const router = Router();
 
-router.get('/', async (req, res) => {
+// Get all trades with pagination
+router.get('/', async (req: Request, res: Response) => {
     try {
-        const { page = '1', limit = '10', status } = req.query;
-        const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const status = req.query.status as string;
+        const skip = (page - 1) * limit;
 
-        const where = status ? { status: status as string } : {};
+        const where = status ? { status: status } : {};
 
         const trades = await prisma.trade.findMany({
             where,
-            take: parseInt(limit as string),
+            take: limit,
             skip,
             orderBy: {
                 createdAt: 'desc'
@@ -27,8 +30,8 @@ router.get('/', async (req, res) => {
             success: true,
             data: trades,
             pagination: {
-                page: parseInt(page as string),
-                limit: parseInt(limit as string),
+                page,
+                limit,
                 total
             }
         });
@@ -41,11 +44,14 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+// Get single trade by ID
+router.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
     try {
+        const tradeId = parseInt(req.params.id);
+        
         const trade = await prisma.trade.findUnique({
             where: {
-                id: parseInt(req.params.id)
+                id: tradeId
             }
         });
 
