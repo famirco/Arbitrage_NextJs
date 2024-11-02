@@ -12,6 +12,24 @@ import { getGasPrice, estimateGas } from '../utils/web3.utils';
 
 const prisma = new PrismaClient();
 
+interface TradeData {
+    id: number;
+    status: string;
+    token: string;
+    buyRpc: string;
+    sellRpc: string;
+    buyPrice: string;
+    sellPrice: string;
+    amount: string;
+    buyTxHash?: string;
+    sellTxHash?: string;
+    profit?: string;
+    gasUsed?: string;
+    error?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 class TradeService extends EventEmitter {
     private web3Instances: Map<string, Web3> = new Map();
     private isTrading: boolean = false;
@@ -39,24 +57,29 @@ class TradeService extends EventEmitter {
         buyRpc: string,
         sellRpc: string,
         amount: string
-    ): Promise<TradeResult> {
+    ): Promise<void> {
         if (this.isTrading) {
-            return { success: false, error: 'Another trade is in progress' };
+            logger.warn('Trade already in progress, skipping...');
+            return;
         }
 
         this.isTrading = true;
-        let trade: Trade | null = null;
 
         try {
-            trade = await prisma.trade.create({
+            const trade: TradeData = await prisma.trade.create({
                 data: {
+                    status: 'PENDING',
                     token,
                     buyRpc,
                     sellRpc,
-                    amount,
-                    status: 'PENDING',
                     buyPrice: '0',
-                    sellPrice: '0'
+                    sellPrice: '0',
+                    amount,
+                    buyTxHash: undefined,
+                    sellTxHash: undefined,
+                    profit: undefined,
+                    gasUsed: undefined,
+                    error: undefined
                 }
             });
 
@@ -68,8 +91,18 @@ class TradeService extends EventEmitter {
             );
 
             if (!buyResult.success) {
-                throw new Error(`Buy failed: ${buyResult.error}`);
+                await this.updateTradeStatus(trade.id, 'FAILED', buyResult.error);
+                return;
             }
+
+            // Update trade with buy transaction
+            await prisma.trade.update({
+                where: { id: trade.id },
+                data: {
+                    buyTxHash: buyResult.txHash,
+                    status: 'BUYING'
+                }
+            });
 
             // Execute sell trade
             const sellResult = await this.executeSellTrade(
@@ -79,46 +112,35 @@ class TradeService extends EventEmitter {
             );
 
             if (!sellResult.success) {
-                throw new Error(`Sell failed: ${sellResult.error}`);
+                await this.updateTradeStatus(trade.id, 'FAILED', sellResult.error);
+                return;
             }
 
-            // Update trade record
-            await prisma.trade.update({
-                where: { id: trade.id },
-                data: {
-                    status: 'SUCCESS',
-                    buyTxHash: buyResult.txHash,
-                    sellTxHash: sellResult.txHash
-                }
-            });
-
-            // Send notification
-            await telegramService.sendMessage(
-                `Trade successful!\nToken: ${token}\nProfit: ${trade.profit}`
-            );
-
-            return { success: true, txHash: sellResult.txHash };
+            // Update trade with sell transaction and mark as success
+            await this.updateTradeStatus(trade.id, 'SUCCESS');
 
         } catch (error) {
-            logger.error('Trade execution failed:', error);
-
-            if (trade) {
-                await prisma.trade.update({
-                    where: { id: trade.id },
-                    data: {
-                        status: 'FAILED',
-                        error: error.message
-                    }
-                });
-            }
-
-            await telegramService.sendMessage(
-                `Trade failed!\nToken: ${token}\nError: ${error.message}`
-            );
-
-            return { success: false, error: error.message };
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            logger.error('Error executing trade:', errorMessage);
+            await this.updateTradeStatus(0, 'FAILED', errorMessage);
         } finally {
             this.isTrading = false;
+        }
+    }
+
+    private async updateTradeStatus(
+        tradeId: number,
+        status: string,
+        error?: string
+    ): Promise<void> {
+        try {
+            await prisma.trade.update({
+                where: { id: tradeId },
+                data: { status, error: error || null }
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            logger.error('Error updating trade status:', errorMessage);
         }
     }
 
