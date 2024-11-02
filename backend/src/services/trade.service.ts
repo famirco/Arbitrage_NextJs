@@ -4,30 +4,20 @@ import { configLoader } from '../utils/config.loader';
 import { rpcService } from './rpc.service';
 import { arbitrageService } from './arbitrage.service';
 import { telegramService } from './telegram.service';
-import { PrismaClient } from '@prisma/client';
-import { Trade, TradeResult } from '../models/trade.model';
+import { PrismaClient, Trade as PrismaTrade } from '@prisma/client';
+import { TradeResult } from '../models/trade.model';
 import BigNumber from 'bignumber.js';
 import logger from '../utils/logger';
 import { getGasPrice, estimateGas } from '../utils/web3.utils';
 
 const prisma = new PrismaClient();
 
-interface TradeData {
-    id: number;
-    status: string;
-    token: string;
-    buyRpc: string;
-    sellRpc: string;
-    buyPrice: string;
-    sellPrice: string;
-    amount: string;
-    buyTxHash?: string;
-    sellTxHash?: string;
-    profit?: string;
-    gasUsed?: string;
-    error?: string;
-    createdAt: Date;
-    updatedAt: Date;
+interface TradeData extends PrismaTrade {
+    buyTxHash: string | null;
+    sellTxHash: string | null;
+    profit: string | null;
+    gasUsed: string | null;
+    error: string | null;
 }
 
 class TradeService extends EventEmitter {
@@ -66,7 +56,7 @@ class TradeService extends EventEmitter {
         this.isTrading = true;
 
         try {
-            const trade: TradeData = await prisma.trade.create({
+            const trade = await prisma.trade.create({
                 data: {
                     status: 'PENDING',
                     token,
@@ -75,11 +65,11 @@ class TradeService extends EventEmitter {
                     buyPrice: '0',
                     sellPrice: '0',
                     amount,
-                    buyTxHash: undefined,
-                    sellTxHash: undefined,
-                    profit: undefined,
-                    gasUsed: undefined,
-                    error: undefined
+                    buyTxHash: null,
+                    sellTxHash: null,
+                    profit: null,
+                    gasUsed: null,
+                    error: null
                 }
             });
 
