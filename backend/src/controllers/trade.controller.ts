@@ -5,22 +5,12 @@ import logger from '../utils/logger';
 const prisma = new PrismaClient();
 const router = Router();
 
-interface TradeQuery {
-    page?: string;
-    limit?: string;
-    status?: string;
-}
-
-interface TradeParams {
-    id: string;
-}
-
 // Get all trades with pagination
-router.get('/', async (req: Request<{}, {}, {}, TradeQuery>, res: Response) => {
+const getAllTrades = async (req: Request, res: Response) => {
     try {
-        const page = parseInt(req.query.page || '1');
-        const limit = parseInt(req.query.limit || '10');
-        const status = req.query.status;
+        const page = parseInt(req.query.page as string || '1');
+        const limit = parseInt(req.query.limit as string || '10');
+        const status = req.query.status as string;
         const skip = (page - 1) * limit;
 
         const where = status ? { status } : {};
@@ -52,10 +42,10 @@ router.get('/', async (req: Request<{}, {}, {}, TradeQuery>, res: Response) => {
             error: 'Internal server error'
         });
     }
-});
+};
 
 // Get single trade by ID
-router.get('/:id', async (req: Request<TradeParams>, res: Response) => {
+const getTradeById = async (req: Request, res: Response) => {
     try {
         const tradeId = parseInt(req.params.id);
         
@@ -83,6 +73,10 @@ router.get('/:id', async (req: Request<TradeParams>, res: Response) => {
             error: 'Internal server error'
         });
     }
-});
+};
+
+// Routes
+router.get('/', getAllTrades);
+router.get('/:id', getTradeById);
 
 export default router;
