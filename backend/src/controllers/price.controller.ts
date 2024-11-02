@@ -1,16 +1,17 @@
-import { Router } from 'express';
+import express from 'express';
 import { priceService } from '../services/price.service';
 import logger from '../utils/logger';
 
-const router = Router();
+const router = express.Router();
 
+// Get all prices
 router.get('/', (req, res) => {
     try {
         const prices = priceService.getAllPrices();
         const formattedPrices = Array.from(prices.entries()).reduce((acc, [token, rpcs]) => {
             acc[token] = Object.fromEntries(rpcs);
             return acc;
-        }, {} as any);
+        }, {} as Record<string, any>);
 
         res.json({
             success: true,
@@ -25,6 +26,7 @@ router.get('/', (req, res) => {
     }
 });
 
+// Get prices for specific token
 router.get('/:token', (req, res) => {
     try {
         const prices = priceService.getPrices(req.params.token);
