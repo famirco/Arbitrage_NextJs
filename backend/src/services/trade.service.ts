@@ -28,13 +28,13 @@ export class TradeService extends EventEmitter {
         super();
         try {
             this.initializeWeb3();
-            this.listenToOpportunities();
+            this.setupOpportunityListener();
         } catch (error) {
             logger.error('Failed to initialize TradeService:', error);
         }
     }
 
-    private initializeWeb3() {
+    private initializeWeb3(): void {
         const rpcs = configLoader.getRpcs();
         const { privateKey } = configLoader.getSettings().web3;
 
@@ -60,7 +60,56 @@ export class TradeService extends EventEmitter {
         }
     }
 
-    // ... other private methods remain the same ...
+    private async executeBuyTrade(
+        web3: Web3,
+        token: string,
+        amount: string
+    ): Promise<TradeResult> {
+        // TODO: Implement actual DEX buy logic
+        return { success: true, txHash: "0x..." };
+    }
+
+    private async executeSellTrade(
+        web3: Web3,
+        token: string,
+        amount: string
+    ): Promise<TradeResult> {
+        // TODO: Implement actual DEX sell logic
+        return { success: true, txHash: "0x..." };
+    }
+
+    private async updateTradeStatus(
+        tradeId: number,
+        status: string,
+        error?: string
+    ): Promise<void> {
+        try {
+            await prisma.trade.update({
+                where: { id: tradeId },
+                data: { status, error: error || null }
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            logger.error('Error updating trade status:', errorMessage);
+        }
+    }
+
+    private setupOpportunityListener(): void {
+        arbitrageService.on('opportunity', async (opportunity) => {
+            const settings = configLoader.getSettings();
+            const token = configLoader.getTokens()
+                .find(t => t.symbol === opportunity.token);
+
+            if (!token) return;
+
+            await this.executeTrade(
+                opportunity.token,
+                opportunity.buyRpc,
+                opportunity.sellRpc,
+                token.minTradeAmount
+            );
+        });
+    }
 
     public async executeTrade(
         token: string,
@@ -93,7 +142,37 @@ export class TradeService extends EventEmitter {
                 }
             });
 
-            // ... rest of the trade execution logic ...
+            const buyResult = await this.executeBuyTrade(
+                this.web3Instances.get(buyRpc)!,
+                token,
+                amount
+            );
+
+            if (!buyResult.success) {
+                await this.updateTradeStatus(trade.id, 'FAILED', buyResult.error);
+                return;
+            }
+
+            await prisma.trade.update({
+                where: { id: trade.id },
+                data: {
+                    buyTxHash: buyResult.txHash,
+                    status: 'BUYING'
+                }
+            });
+
+            const sellResult = await this.executeSellTrade(
+                this.web3Instances.get(sellRpc)!,
+                token,
+                amount
+            );
+
+            if (!sellResult.success) {
+                await this.updateTradeStatus(trade.id, 'FAILED', sellResult.error);
+                return;
+            }
+
+            await this.updateTradeStatus(trade.id, 'SUCCESS');
 
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
