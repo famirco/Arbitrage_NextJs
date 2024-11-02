@@ -4,20 +4,16 @@ import { configLoader } from '../utils/config.loader';
 import { rpcService } from './rpc.service';
 import { arbitrageService } from './arbitrage.service';
 import { telegramService } from './telegram.service';
-import { PrismaClient, Trade as PrismaTrade } from '@prisma/client';
-import { TradeResult } from '../models/trade.model';
+import { PrismaClient } from '@prisma/client';
+import { Trade, TradeResult } from '../models/trade.model';
 import BigNumber from 'bignumber.js';
 import logger from '../utils/logger';
 import { getGasPrice, estimateGas } from '../utils/web3.utils';
 
 const prisma = new PrismaClient();
 
-export interface TradeData extends PrismaTrade {
-    buyTxHash: string | null;
-    sellTxHash: string | null;
-    profit: string | null;
-    gasUsed: string | null;
-    error: string | null;
+export interface TradeData extends Trade {
+    // Additional fields if needed
 }
 
 export class TradeService extends EventEmitter {
