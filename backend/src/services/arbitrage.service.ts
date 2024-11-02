@@ -16,7 +16,7 @@ interface ArbitrageOpportunity {
 }
 
 class ArbitrageService extends EventEmitter {
-    private checkInterval: NodeJS.Timeout;
+    private checkInterval: NodeJS.Timeout | null = null;
 
     constructor() {
         super();
@@ -39,12 +39,12 @@ class ArbitrageService extends EventEmitter {
             const prices = priceService.getPrices(token.symbol);
             if (!prices || prices.size < 2) continue;
 
-            const priceArray = Array.from(prices.entries());
-            
-            for (let i = 0; i < priceArray.length; i++) {
-                for (let j = i + 1; j < priceArray.length; j++) {
-                    const [buyRpc, buyData] = priceArray[i];
-                    const [sellRpc, sellData] = priceArray[j];
+            const priceEntries = Array.from(prices.entries());
+
+            for (let i = 0; i < priceEntries.length; i++) {
+                for (let j = i + 1; j < priceEntries.length; j++) {
+                    const [buyRpc, buyData] = priceEntries[i];
+                    const [sellRpc, sellData] = priceEntries[j];
 
                     const profit = this.calculateProfit(
                         buyData.price,
@@ -52,9 +52,8 @@ class ArbitrageService extends EventEmitter {
                         token.minTradeAmount
                     );
 
-                    const profitPercentage = profit
-                        .dividedBy(new BigNumber(buyData.price))
-                        .multipliedBy(100);
+                    const buyPrice = new BigNumber(buyData.price);
+                    const profitPercentage = profit.dividedBy(buyPrice).multipliedBy(100);
 
                     if (profitPercentage.isGreaterThan(minProfitPercentage)) {
                         const opportunity: ArbitrageOpportunity = {
@@ -88,6 +87,7 @@ class ArbitrageService extends EventEmitter {
     public stop() {
         if (this.checkInterval) {
             clearInterval(this.checkInterval);
+            this.checkInterval = null;
         }
         this.removeAllListeners();
         logger.info('Arbitrage service stopped');
