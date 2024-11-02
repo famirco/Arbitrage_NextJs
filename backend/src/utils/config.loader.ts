@@ -39,7 +39,23 @@ export interface Settings {
 class ConfigLoader {
     private rpcs: RpcConfig[] = [];
     private tokens: TokenConfig[] = [];
-    private settings: Settings;
+    private settings: Settings = {
+        trading: {
+            checkInterval: 10,
+            walletPercentage: 10,
+            gasLimit: 300000,
+            maxSlippage: 0.5,
+            minProfitPercentage: 0.1
+        },
+        telegram: {
+            botToken: '',
+            chatId: ''
+        },
+        web3: {
+            privateKey: '',
+            gasMultiplier: 1.1
+        }
+    };
     private configPath: string;
 
     constructor() {
@@ -49,19 +65,27 @@ class ConfigLoader {
 
     private loadConfigs() {
         try {
+            // Load RPC config
             const rpcFile = fs.readFileSync(path.join(this.configPath, 'rpc.yaml'), 'utf8');
             this.rpcs = (yaml.load(rpcFile) as { rpcs: RpcConfig[] }).rpcs;
 
+            // Load tokens config
             const tokenFile = fs.readFileSync(path.join(this.configPath, 'tokens.yaml'), 'utf8');
             this.tokens = (yaml.load(tokenFile) as { tokens: TokenConfig[] }).tokens;
 
+            // Load settings
             const settingsFile = fs.readFileSync(path.join(this.configPath, 'settings.yaml'), 'utf8');
             this.settings = yaml.load(settingsFile) as Settings;
 
             logger.info('Configs loaded successfully');
         } catch (error) {
-            logger.error('Error loading configs:', error);
-            process.exit(1);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            logger.error('Error loading configs:', errorMessage);
+            
+            // Don't exit if we're in development mode
+            if (process.env.NODE_ENV === 'production') {
+                process.exit(1);
+            }
         }
     }
 
