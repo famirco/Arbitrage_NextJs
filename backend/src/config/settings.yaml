@@ -10,5 +10,5 @@ telegram:
   chatId: "33478448"
 
 web3:
-  privateKey: "YOUR-PRIVATE-KEY"
+  privateKey: "938cc882489f69fc410975ece928268c35289171d5d04053798170ffea884ae3"
   gasMultiplier: 1.1
