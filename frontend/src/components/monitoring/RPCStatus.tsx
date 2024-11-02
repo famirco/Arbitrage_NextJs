@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, Title, List, ListItem, Badge } from '@tremor/react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 

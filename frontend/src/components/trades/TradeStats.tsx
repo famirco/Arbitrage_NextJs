@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, Grid, Metric, Text } from '@tremor/react';
 import { useEffect, useState } from 'react';
 import { fetchApi } from '@/utils/api';

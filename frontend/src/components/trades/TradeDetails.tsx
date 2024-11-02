@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, Title, Grid, Text, Metric, Badge, List, ListItem } from '@tremor/react';
 import { Trade } from '@/types/trade';
 

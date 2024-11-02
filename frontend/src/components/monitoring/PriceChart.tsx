@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, Title } from '@tremor/react';
 import { Line } from 'react-chartjs-2';
 import { useWebSocket } from '@/hooks/useWebSocket';
