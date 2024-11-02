@@ -5,7 +5,11 @@ interface FetchOptions extends RequestInit {
 }
 
 export async function fetchApi<T>(endpoint: string, options?: FetchOptions): Promise<T> {
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const url = endpoint.startsWith('/') ? `${API_URL}${endpoint}` : `${API_URL}/${endpoint}`;
+  
+  console.log('Fetching:', url); // برای debug
+  
+  const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       ...options?.headers,
