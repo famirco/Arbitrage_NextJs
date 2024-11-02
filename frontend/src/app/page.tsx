@@ -1,3 +1,5 @@
+"use client";
+
 import PriceOverview from "@/components/dashboard/PriceOverview";
 import ArbitrageOpportunities from "@/components/dashboard/ArbitrageOpportunities";
 import SystemStatus from "@/components/dashboard/SystemStatus";

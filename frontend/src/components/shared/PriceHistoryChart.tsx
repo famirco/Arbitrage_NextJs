@@ -33,13 +33,22 @@ interface PricePoint {
   rpc: string;
 }
 
+interface ChartDataType {
+  datasets: {
+    label: string;
+    data: { x: number; y: number }[];
+    borderColor: string;
+    tension: number;
+  }[];
+}
+
 interface PriceHistoryChartProps {
   data: PricePoint[];
   token: string;
 }
 
 export default function PriceHistoryChart({ data, token }: PriceHistoryChartProps) {
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<ChartDataType | null>(null);
 
   useEffect(() => {
     const rpcs = [...new Set(data.map(point => point.rpc))];
@@ -57,9 +66,7 @@ export default function PriceHistoryChart({ data, token }: PriceHistoryChartProp
       };
     });
 
-    setChartData({
-      datasets
-    });
+    setChartData({ datasets });
   }, [data]);
 
   const options = {

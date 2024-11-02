@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Title, TextInput, NumberInput, Button, Select, SelectItem } from '@tremor/react';
+import { Card, Title, NumberInput, Button } from '@tremor/react';
 import { useState, useEffect } from 'react';
 import { fetchApi } from '@/utils/api';
 

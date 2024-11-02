@@ -30,14 +30,28 @@ interface PriceData {
   prices: Record<string, string>;
 }
 
+interface ChartDataType {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor: string;
+    tension: number;
+  }[];
+}
+
 export default function PriceChart() {
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<ChartDataType | null>(null);
   const { data } = useWebSocket<PriceData>('price-history');
 
   useEffect(() => {
     if (data) {
       // Transform data for chart
-      // ... implementation
+      const transformedData: ChartDataType = {
+        labels: [],
+        datasets: []
+      };
+      setChartData(transformedData);
     }
   }, [data]);
 
