@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, RequestHandler } from 'express';
 import { PrismaClient } from '@prisma/client';
 import logger from '../utils/logger';
 
@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const router = Router();
 
 // Get all trades with pagination
-const getAllTrades = async (req: Request, res: Response) => {
+const getAllTrades: RequestHandler = async (req, res) => {
     try {
         const page = parseInt(req.query.page as string || '1');
         const limit = parseInt(req.query.limit as string || '10');
@@ -45,7 +45,7 @@ const getAllTrades = async (req: Request, res: Response) => {
 };
 
 // Get single trade by ID
-const getTradeById = async (req: Request, res: Response) => {
+const getTradeById: RequestHandler = async (req, res) => {
     try {
         const tradeId = parseInt(req.params.id);
         
