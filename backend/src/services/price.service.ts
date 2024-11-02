@@ -25,7 +25,7 @@ const ERC20_ABI: AbiItem[] = [
 
 class PriceService extends EventEmitter {
     private prices: Map<string, Map<string, PriceStatus>> = new Map();
-    private updateInterval: NodeJS.Timeout;
+    private updateInterval: NodeJS.Timeout | null = null;
 
     constructor() {
         super();
@@ -45,7 +45,8 @@ class PriceService extends EventEmitter {
                 lastUpdate: new Date()
             };
         } catch (error) {
-            logger.error(`Error fetching price for ${tokenAddress} on ${rpcName}:`, error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            logger.error(`Error fetching price for ${tokenAddress} on ${rpcName}:`, errorMessage);
             return null;
         }
     }
@@ -76,7 +77,8 @@ class PriceService extends EventEmitter {
         const { checkInterval } = configLoader.getSettings().trading;
         this.updateInterval = setInterval(() => {
             this.updatePrices().catch(error => {
-                logger.error('Error updating prices:', error);
+                const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                logger.error('Error updating prices:', errorMessage);
             });
         }, checkInterval * 1000);
     }
@@ -92,6 +94,7 @@ class PriceService extends EventEmitter {
     public stop() {
         if (this.updateInterval) {
             clearInterval(this.updateInterval);
+            this.updateInterval = null;
         }
         this.removeAllListeners();
         logger.info('Price service stopped');
