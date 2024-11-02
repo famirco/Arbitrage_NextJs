@@ -1,0 +1,9 @@
+rpcs:
+  - url: "https://eth-mainnet.g.alchemy.com/v2/OWvLe_9viQpA-m2yo24MC_a_Thl2_TvV"
+    chainId: 1
+    name: "Alchemy"
+    timeout: 5000
+  - url: "https://mainnet.infura.io/v3/5019dcc9e1ab4295920365730d4e5e79"
+    chainId: 1
+    name: "Infura"
+    timeout: 5000

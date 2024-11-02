@@ -1,0 +1,14 @@
+trading:
+  checkInterval: 10
+  walletPercentage: 10
+  gasLimit: 300000
+  maxSlippage: 0.5
+  minProfitPercentage: 0.1
+
+telegram:
+  botToken: "7536476647:AAHV2vWz54UP9O32VHIXVCoIZPesfG6Uz-0"
+  chatId: "33478448"
+
+web3:
+  privateKey: "YOUR-PRIVATE-KEY"
+  gasMultiplier: 1.1

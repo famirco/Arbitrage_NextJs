@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Trade {
+  id            Int      @id @default(autoincrement())
+  token         String
+  buyRpc        String
+  sellRpc       String
+  buyPrice      String
+  sellPrice     String
+  amount        String
+  buyTxHash     String?
+  sellTxHash    String?
+  status        String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  profit        String?
+  gasUsed       String?
+  error         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
