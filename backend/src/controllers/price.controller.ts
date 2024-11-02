@@ -4,8 +4,8 @@ import logger from '../utils/logger';
 
 const router = express.Router();
 
-// Get all prices
-router.get('/', (req, res) => {
+// Define route handlers separately
+const getAllPrices = (req: express.Request, res: express.Response) => {
     try {
         const prices = priceService.getAllPrices();
         const formattedPrices = Array.from(prices.entries()).reduce((acc, [token, rpcs]) => {
@@ -24,10 +24,9 @@ router.get('/', (req, res) => {
             error: 'Internal server error'
         });
     }
-});
+};
 
-// Get prices for specific token
-router.get('/:token', (req, res) => {
+const getTokenPrices = (req: express.Request, res: express.Response) => {
     try {
         const prices = priceService.getPrices(req.params.token);
         if (!prices) {
@@ -48,6 +47,10 @@ router.get('/:token', (req, res) => {
             error: 'Internal server error'
         });
     }
-});
+};
+
+// Apply routes
+router.get('/', getAllPrices);
+router.get('/:token', getTokenPrices);
 
 export default router;
