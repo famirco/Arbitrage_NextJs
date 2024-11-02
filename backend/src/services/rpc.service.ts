@@ -3,12 +3,11 @@ import { EventEmitter } from 'events';
 import { configLoader } from '../utils/config.loader';
 import { RpcStatus } from '../models/status.model';
 import logger from '../utils/logger';
-import { HttpProvider } from 'web3-core';
 
 class RpcService extends EventEmitter {
     private rpcs: Map<string, Web3> = new Map();
     private status: Map<string, RpcStatus> = new Map();
-    private checkInterval: NodeJS.Timeout | null = null;  // Initialize as null
+    private checkInterval: NodeJS.Timeout | null = null;
     private readonly MAX_ERROR_COUNT = 3;
     private readonly RESPONSE_TIME_THRESHOLD = 5000; // 5 seconds
 
@@ -22,11 +21,8 @@ class RpcService extends EventEmitter {
         const rpcConfigs = configLoader.getRpcs();
         rpcConfigs.forEach(rpc => {
             try {
-                const provider = new Web3.providers.HttpProvider(rpc.url, {
-                    timeout: rpc.timeout,
-                }) as HttpProvider;
-                
-                const web3 = new Web3(provider);
+                // Create Web3 instance directly with the URL
+                const web3 = new Web3(rpc.url);
                 this.rpcs.set(rpc.name, web3);
                 this.status.set(rpc.name, {
                     isActive: true,
