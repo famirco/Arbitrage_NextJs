@@ -19,7 +19,12 @@ const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://amirez.info', 'https://amirez.info'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Routes
