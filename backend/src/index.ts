@@ -45,7 +45,7 @@ wss.on('connection', (ws) => {
 });
 
 // Start server
-const PORT = 3001;  
+const PORT = 80;  
 
 server.listen(PORT, '0.0.0.0', () => {
     logger.info(`Server running on port ${PORT}`);
