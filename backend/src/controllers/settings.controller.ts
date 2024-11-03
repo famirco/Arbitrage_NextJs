@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import logger from '../utils/logger';  // مسیر درست
 
 const router = Router();
 
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error getting settings:', error);
+        logger.error('Error getting settings:', error);
         res.status(500).json({ 
             status: 'error',
             message: 'Internal server error'
