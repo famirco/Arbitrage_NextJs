@@ -1,3 +1,4 @@
+import settingsController from './controllers/settings.controller';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
@@ -11,7 +12,7 @@ import tradeRoutes from './controllers/trade.controller';
 import priceRoutes from './controllers/price.controller';
 import statusRoutes from './controllers/status.controller';
 import logger from './utils/logger';
-import settingsController from './controllers/settings.controller';
+
 
 const app = express();
 const server = createServer(app);
