@@ -20,9 +20,10 @@ const wss = new WebSocketServer({ server });
 
 // Middleware
 app.use(cors({
-    origin: ['http://amirez.info', 'https://amirez.info'],
+    origin: ['http://amirez.info', 'https://amirez.info', 'http://www.amirez.info', 'https://www.amirez.info'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 app.use(express.json());
