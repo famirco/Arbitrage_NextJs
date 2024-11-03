@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import logger from '../utils/logger';
 
 const router = Router();
 
@@ -10,12 +9,11 @@ router.get('/', async (req, res) => {
             data: {
                 settings: {
                     enabled: true,
-                    // other settings...
                 }
             }
         });
     } catch (error) {
-        logger.error('Error getting settings:', error);
+        console.error('Error getting settings:', error);
         res.status(500).json({ 
             status: 'error',
             message: 'Internal server error'
