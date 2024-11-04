@@ -1,14 +1,13 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
+const API_URL = 'https://amirez.info:3001';
 interface FetchOptions extends RequestInit {
   body?: string;
 }
 
 export async function fetchApi<T>(endpoint: string, options?: FetchOptions): Promise<T> {
   const url = endpoint.startsWith('/') ? `${API_URL}${endpoint}` : `${API_URL}/${endpoint}`;
-  
-  console.log('Fetching:', url); // برای debug
-  
+
+  console.log('Fetching:', url);
+
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',

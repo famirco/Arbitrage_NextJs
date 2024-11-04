@@ -2,9 +2,10 @@
 const nextConfig = {
   output: 'standalone',
   distDir: '.next',
-  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://amirez.info' : '',
+  assetPrefix: 'https://amirez.info',
   experimental: {
-    outputStandalone: true
+    outputFileTracingRoot: process.env.NODE_ENV === 'production' ? 
+      '/root/Arbitrage_NextJs/frontend' : undefined,
   }
 }
 

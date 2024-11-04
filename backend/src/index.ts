@@ -20,7 +20,16 @@ const wss = new WebSocketServer({ server });
 
 // Middleware
 app.use(cors({
-    origin: ['http://amirez.info', 'https://amirez.info', 'http://www.amirez.info', 'https://www.amirez.info'],
+    origin: [
+        'http://amirez.info',
+        'https://amirez.info',
+        'http://www.amirez.info',
+        'https://www.amirez.info',
+        'http://141.11.1.212',
+        'http://localhost',
+        'http://localhost:80',
+        'http://localhost:3001'  // اضافه شد
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
