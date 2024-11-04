@@ -1,35 +1,29 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
 
-const API_URL = 'http://localhost:3001';
-
-
 export function useWebSocket<T>(event: string) {
-  const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const socketRef = useRef<Socket | null>(null);
+    const [socket, setSocket] = useState<Socket | null>(null);
+    const [data, setData] = useState<T | null>(null);
 
-  useEffect(() => {
-    socketRef.current = io(API_URL);
+    useEffect(() => {
+        const newSocket = io('https://amirez.info:3001', {
+            transports: ['polling', 'websocket'],
+            autoConnect: true,
+            withCredentials: true,
+        });
 
-    socketRef.current.on('connect', () => {
-      console.log('WebSocket connected');
-    });
+        setSocket(newSocket);
 
-    socketRef.current.on(event, (newData: T) => {
-      setData(newData);
-    });
+        newSocket.on(event, (newData: T) => {
+            setData(newData);
+        });
 
-    socketRef.current.on('error', (err: Error) => {
-      setError(err);
-    });
+        return () => {
+            newSocket.disconnect();
+        };
+    }, [event]);
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-  }, [event]);
-
-  return { data, error };
+    return { socket, data };
 }
+
+export default useWebSocket;
