@@ -2,10 +2,11 @@
 const nextConfig = {
     output: 'standalone',
     experimental: {
-        serverActions: {
-            bodySizeLimit: '2mb'
-        }
-    }
-}
-
-module.exports = nextConfig
+      outputStandalone: true
+    },
+    // اضافه کردن basePath و assetPrefix
+    basePath: '',
+    assetPrefix: ''
+  }
+  
+  module.exports = nextConfig
