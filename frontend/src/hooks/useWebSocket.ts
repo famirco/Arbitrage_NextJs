@@ -6,7 +6,7 @@ export function useWebSocket<T>(event: string) {
     const [data, setData] = useState<T | null>(null);
 
     useEffect(() => {
-        const newSocket = io('https://amirez.info:3001', {
+        const newSocket = io('https://api.amirez.info:3001', {
             transports: ['polling', 'websocket'],
             autoConnect: true,
             withCredentials: true,
