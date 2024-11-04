@@ -1,9 +1,11 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import logger from '../utils/logger';
+import BigNumber from 'bignumber.js';
 
 const prisma = new PrismaClient();
 const router = express.Router();
+
 
 
 // Get all trades with pagination
@@ -83,17 +85,31 @@ router.get('/stats', async (req, res) => {
             totalTrades,
             successfulTrades,
             failedTrades,
-            profitStats
+            successfulTradesWithProfit
         ] = await Promise.all([
             prisma.trade.count(),
             prisma.trade.count({ where: { status: 'SUCCESS' } }),
             prisma.trade.count({ where: { status: 'FAILED' } }),
-            prisma.trade.aggregate({
-                where: { status: 'SUCCESS' },
-                _sum: { profit: true },
-                _avg: { profit: true }
+            prisma.trade.findMany({
+                where: { 
+                    status: 'SUCCESS',
+                    profit: { not: null }
+                },
+                select: { profit: true }
             })
         ]);
+
+        // Calculate total and average profit manually
+        let totalProfit = new BigNumber(0);
+        successfulTradesWithProfit.forEach(trade => {
+            if (trade.profit) {
+                totalProfit = totalProfit.plus(new BigNumber(trade.profit));
+            }
+        });
+
+        const averageProfit = successfulTradesWithProfit.length > 0
+            ? totalProfit.dividedBy(successfulTradesWithProfit.length)
+            : new BigNumber(0);
 
         res.json({
             success: true,
@@ -101,8 +117,8 @@ router.get('/stats', async (req, res) => {
                 totalTrades,
                 successfulTrades,
                 failedTrades,
-                totalProfit: profitStats._sum.profit?.toString() || "0",
-                averageProfit: profitStats._avg.profit?.toString() || "0"
+                totalProfit: totalProfit.toString(),
+                averageProfit: averageProfit.toString()
             }
         });
     } catch (error) {
