@@ -39,6 +39,9 @@ app.use(express.json());
 
 // Routes
 app.use('/api/settings', settingsController);
+app.use('/api/trades', tradeRoutes);
+app.use('/api/prices', priceRoutes);
+app.use('/api/status', statusRoutes);
 
 // WebSocket connection handling
 wss.on('connection', (ws) => {
