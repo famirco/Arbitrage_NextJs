@@ -5,6 +5,7 @@ import logger from '../utils/logger';
 const prisma = new PrismaClient();
 const router = express.Router();
 
+
 // Get all trades with pagination
 router.get('/', (req, res) => {
     const page = parseInt(req.query.page as string || '1');
@@ -74,6 +75,43 @@ router.get('/:id', (req, res) => {
             error: 'Internal server error'
         });
     });
+});
+
+router.get('/stats', async (req, res) => {
+    try {
+        const [
+            totalTrades,
+            successfulTrades,
+            failedTrades,
+            profitStats
+        ] = await Promise.all([
+            prisma.trade.count(),
+            prisma.trade.count({ where: { status: 'SUCCESS' } }),
+            prisma.trade.count({ where: { status: 'FAILED' } }),
+            prisma.trade.aggregate({
+                where: { status: 'SUCCESS' },
+                _sum: { profit: true },
+                _avg: { profit: true }
+            })
+        ]);
+
+        res.json({
+            success: true,
+            data: {
+                totalTrades,
+                successfulTrades,
+                failedTrades,
+                totalProfit: profitStats._sum.profit?.toString() || "0",
+                averageProfit: profitStats._avg.profit?.toString() || "0"
+            }
+        });
+    } catch (error) {
+        logger.error('Error getting trade stats:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error'
+        });
+    }
 });
 
 export default router;
