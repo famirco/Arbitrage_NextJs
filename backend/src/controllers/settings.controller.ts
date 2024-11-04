@@ -1,27 +1,16 @@
 import { Router } from 'express';
+import { configLoader } from '../utils/config.loader';
 import logger from '../utils/logger';
 
 const router = Router();
 
 router.get('/', async (req, res) => {
     try {
-        // اینجا تنظیمات رو برمی‌گردونیم
-        res.json({
-            status: 'success',
-            data: {
-                // تنظیمات پیش‌فرض
-                settings: {
-                    enabled: true,
-                    // سایر تنظیمات...
-                }
-            }
-        });
+        const settings = await configLoader.getConfig();
+        res.json(settings);
     } catch (error) {
-        logger.error('Error getting settings:', error);
-        res.status(500).json({ 
-            status: 'error',
-            message: 'Internal server error'
-        });
+        logger.error('Error fetching settings:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
