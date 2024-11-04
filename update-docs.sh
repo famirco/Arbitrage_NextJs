@@ -13,7 +13,17 @@ echo ""
 echo "Enter change description (press Ctrl+D when done):"
 CHANGES=$(cat)
 
-# اضافه کردن تغییرات جدید به CHANGELOG.md
-sed -i "4i\\\n## [$DATE]\n$CHANGES\n" CHANGELOG.md
+# ایجاد یک فایل موقت و اضافه کردن تغییرات جدید
+(
+echo "# Changelog"
+echo ""
+echo "## [$DATE]"
+echo "$CHANGES"
+echo ""
+cat CHANGELOG.md | tail -n +2
+) > CHANGELOG.tmp
+
+# جایگزینی فایل اصلی با فایل موقت
+mv CHANGELOG.tmp CHANGELOG.md
 
 echo -e "${GREEN}Documentation updated successfully!${NC}"
