@@ -1,4 +1,4 @@
-const API_URL = 'https://api.amirez.info:3001';
+const API_URL = 'http://141.11.1.212:3001';
 
 
 interface FetchOptions extends RequestInit {
