@@ -2,6 +2,28 @@
 
 ## [2024-11-04]
 ### Changed
+- Updated Next.js configuration for static file handling
+- Modified frontend service configuration
+- Updated build process for better static file management
+
+### Fixed
+- Removed conflicting _next folder from public directory
+- Updated static file serving configuration
+- Modified asset prefix settings in next.config.js
+
+### Current Issues
+- Static file loading still failing (404 errors)
+- Need to investigate Cloudflare caching and routing
+- Frontend build process needs optimization
+
+### Next Steps
+- Review Cloudflare page rules
+- Investigate static file serving in production
+- Consider implementing CDN for static assets
+
+
+## [2024-11-04]
+### Changed
 - Updated Next.js configuration to use standalone output
 - Modified frontend service to use standalone server
 - Updated build and deployment process
