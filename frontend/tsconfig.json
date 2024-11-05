@@ -1,4 +1,3 @@
-export const API_BASE_URL = 'https://amirez.info/api';
 {
   "compilerOptions": {
     "target": "ES2017",
