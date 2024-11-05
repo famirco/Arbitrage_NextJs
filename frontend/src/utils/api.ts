@@ -1,4 +1,4 @@
-const API_URL = 'http://141.11.1.212:3001';
+const API_URL = '/api';
 
 
 interface FetchOptions extends RequestInit {

@@ -6,7 +6,7 @@ export function useWebSocket<T>(event: string) {
     const [data, setData] = useState<T | null>(null);
 
     useEffect(() => {
-        const newSocket = io('http://141.11.1.212:3001', {
+        const newSocket = io('/api', {
             transports: ['polling', 'websocket'],
             autoConnect: true,
             withCredentials: true,
