@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
-  assetPrefix: 'https://amirez.info'
+  output: 'standalone'
 }
 
 module.exports = nextConfig
