@@ -1,8 +1,8 @@
 module.exports = {
   apps: [{
     name: 'arbitrage-frontend',
-    cwd: '/var/www/arbitrage',
-    script: 'server.js',
+    cwd: '/root/Arbitrage_NextJs/frontend',
+    script: '.next/standalone/server.js',
     env: {
       PORT: 3000,
       NODE_ENV: 'production',
