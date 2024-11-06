@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Trade } from '@prisma/client';  // اضافه کردن Trade
 
 const prisma = new PrismaClient();
 const app = express();
@@ -14,8 +14,8 @@ app.use(cors({
     credentials: true
 }));
 
-// یک interval مشترک برای همه کاربران
-let cachedTrades = [];
+// تعریف نوع برای cachedTrades
+let cachedTrades: Trade[] = [];
 let connectedClients = 0;
 let globalMonitoringInterval: NodeJS.Timeout | null = null;
 
