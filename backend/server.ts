@@ -1,4 +1,13 @@
-const io = new Server(httpServer, {
+import express from 'express';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';  // تغییر نام import
+import cors from 'cors';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+const app = express();
+const httpServer = createServer(app);  // تعریف httpServer
+const io = new SocketIOServer(httpServer, {  // استفاده از نام جدید
     cors: {
         origin: "https://amirez.info",
         methods: ["GET", "POST"],

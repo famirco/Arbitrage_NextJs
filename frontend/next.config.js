@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  experimental: {
-      outputFileTracingRoot: process.cwd(),  // اضافه کردن مسیر صحیح
-  }
+  outputFileTracingRoot: process.cwd()  // جابجایی از experimental به root
 }
 
 module.exports = nextConfig
