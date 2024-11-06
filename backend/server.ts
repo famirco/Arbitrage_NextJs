@@ -4,10 +4,22 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 
+// Import controllers
+import statusController from './src/controllers/status.controller';
+import settingsController from './src/controllers/settings.controller';
+import priceController from './src/controllers/price.controller';
+import tradeController from './src/controllers/trade.controller';
+
 const prisma = new PrismaClient();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/status', statusController);
+app.use('/api/settings', settingsController);
+app.use('/api/price', priceController);
+app.use('/api/trade', tradeController);
 
 // Monitoring endpoint
 app.get('/monitoring', async (req, res) => {
