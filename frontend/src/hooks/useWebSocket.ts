@@ -8,8 +8,9 @@ export function useWebSocket<T>(event: string) {
     useEffect(() => {
         const newSocket = io('https://amirez.info', {
             path: '/socket.io/',
-            transports: ['websocket'],
+            transports: ['websocket', 'polling'],
             secure: true,
+            rejectUnauthorized: false,
             reconnection: true,
             reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
