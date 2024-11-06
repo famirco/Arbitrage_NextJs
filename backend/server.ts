@@ -2,22 +2,13 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
-import { PrismaClient, Trade } from '@prisma/client';  // اضافه کردن Trade
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const app = express();
 const httpServer = createServer(app);
 
-// تنظیمات CORS
-app.use(cors({
-    origin: "https://amirez.info",
-    credentials: true
-}));
-
-// تعریف نوع برای cachedTrades
-let cachedTrades: Trade[] = [];
-let connectedClients = 0;
-let globalMonitoringInterval: NodeJS.Timeout | null = null;
+app.use(cors());
 
 const io = new SocketIOServer(httpServer, {
     cors: {
@@ -28,77 +19,40 @@ const io = new SocketIOServer(httpServer, {
     path: '/socket.io/',
     transports: ['websocket'],
     pingTimeout: 60000,
-    pingInterval: 25000
+    pingInterval: 25000,
+    allowEIO3: true
 });
-
-// تابع به‌روزرسانی trades
-async function updateTrades() {
-    try {
-        cachedTrades = await prisma.trade.findMany({
-            take: 5,
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-        
-        // ارسال به همه کلاینت‌های متصل
-        io.emit('monitoring-update', {
-            trades: cachedTrades,
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        console.error('Error updating trades:', error);
-    }
-}
 
 io.on("connection", (socket) => {
     console.log("Client connected:", socket.id);
-    connectedClients++;
-
-    // ارسال داده‌های کش شده به کلاینت جدید
-    socket.emit('monitoring-update', {
-        trades: cachedTrades,
-        timestamp: new Date().toISOString()
-    });
-
-    // شروع interval اگر اولین کلاینت است
-    if (connectedClients === 1 && !globalMonitoringInterval) {
-        globalMonitoringInterval = setInterval(updateTrades, 5000);
-        updateTrades(); // اولین به‌روزرسانی
-    }
+    
+    // ارسال آپدیت‌های مانیتورینگ
+    const monitoringInterval = setInterval(async () => {
+        try {
+            const latestTrades = await prisma.trade.findMany({
+                take: 5,
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+            
+            socket.emit('monitoring-update', {
+                trades: latestTrades,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Socket monitoring error:', error);
+        }
+    }, 5000);
 
     socket.on("error", (error) => {
         console.error("Socket error:", error);
     });
 
     socket.on("disconnect", () => {
-        connectedClients--;
+        clearInterval(monitoringInterval);
         console.log("Client disconnected:", socket.id);
-
-        // توقف interval اگر کلاینتی باقی نمانده
-        if (connectedClients === 0 && globalMonitoringInterval) {
-            clearInterval(globalMonitoringInterval);
-            globalMonitoringInterval = null;
-        }
     });
-});
-
-// Error handling
-process.on('unhandledRejection', (error) => {
-    console.error('Unhandled Rejection:', error);
-});
-
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-});
-
-// Cleanup on shutdown
-process.on('SIGTERM', async () => {
-    if (globalMonitoringInterval) {
-        clearInterval(globalMonitoringInterval);
-    }
-    await prisma.$disconnect();
-    process.exit(0);
 });
 
 const PORT = process.env.PORT || 3001;

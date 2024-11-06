@@ -6,17 +6,16 @@ export function useWebSocket<T>(event: string) {
     const [data, setData] = useState<T | null>(null);
 
     useEffect(() => {
-        const newSocket = io('https://amirez.info', {
+        const newSocket = io('wss://amirez.info', {
             path: '/socket.io/',
-            transports: ['websocket', 'polling'],
-            autoConnect: true,
-            withCredentials: true,
+            transports: ['websocket'],
+            secure: true,
+            rejectUnauthorized: false,
+            reconnection: true,
+            reconnectionAttempts: 5,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
-            reconnectionAttempts: 5,
-            extraHeaders: {
-                'Access-Control-Allow-Origin': '*'
-            }
+            timeout: 20000,
         });
 
         newSocket.on('connect', () => {
