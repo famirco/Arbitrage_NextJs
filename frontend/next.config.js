@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   experimental: {
-    outputFileTracingRoot: undefined,
+      outputFileTracingRoot: process.cwd(),  // اضافه کردن مسیر صحیح
   }
 }
 
