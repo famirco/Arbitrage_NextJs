@@ -6,16 +6,17 @@ export function useWebSocket<T>(event: string) {
     const [data, setData] = useState<T | null>(null);
 
     useEffect(() => {
-        const newSocket = io('wss://amirez.info', {
+        const newSocket = io('https://amirez.info', {
             path: '/socket.io/',
             transports: ['websocket'],
             secure: true,
-            rejectUnauthorized: false,
             reconnection: true,
-            reconnectionAttempts: 5,
+            reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             timeout: 20000,
+            autoConnect: true,
+            forceNew: true
         });
 
         newSocket.on('connect', () => {
