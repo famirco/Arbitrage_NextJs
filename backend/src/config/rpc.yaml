@@ -1,9 +1,25 @@
 rpcs:
-  - url: "https://eth-mainnet.g.alchemy.com/v2/OWvLe_9viQpA-m2yo24MC_a_Thl2_TvV"
+  - name: "Alchemy"
+    httpUrl: "https://eth-mainnet.g.alchemy.com/v2/OWvLe_9viQpA-m2yo24MC_a_Thl2_TvV"
+    wsUrl: "wss://eth-mainnet.g.alchemy.com/v2/OWvLe_9viQpA-m2yo24MC_a_Thl2_TvV"
     chainId: 1
-    name: "Alchemy"
     timeout: 5000
-  - url: "https://mainnet.infura.io/v3/5019dcc9e1ab4295920365730d4e5e79"
+    maxReconnectAttempts: 5
+    reconnectDelay: 5000
+    healthCheckInterval: 30000
+
+  - name: "Infura"
+    httpUrl: "https://mainnet.infura.io/v3/5019dcc9e1ab4295920365730d4e5e79"
+    wsUrl: "wss://mainnet.infura.io/ws/v3/5019dcc9e1ab4295920365730d4e5e79"
     chainId: 1
-    name: "Infura"
     timeout: 5000
+    maxReconnectAttempts: 5
+    reconnectDelay: 5000
+    healthCheckInterval: 30000
+
+# Global settings
+settings:
+  defaultTimeout: 5000
+  maxResponseTime: 5000
+  maxErrorCount: 3
+  blockSubscription: true
