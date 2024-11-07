@@ -14,19 +14,6 @@ module.exports = {
           PORT: 3001
         }
       },
-      {
-        name: 'arbitrage-frontend',
-        cwd: '../frontend',
-        script: 'npm',
-        args: 'start',
-        instances: 1,
-        exec_mode: 'fork',
-        watch: false,
-        max_memory_restart: '500M',
-        env: {
-          NODE_ENV: 'production',
-          PORT: 3000
-        }
-      }
+      
     ]
   };
