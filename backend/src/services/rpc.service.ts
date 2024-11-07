@@ -29,7 +29,7 @@ class RpcService extends EventEmitter {
 
     private async connectRpc(rpc: any) {
         try {
-            const wsUrl = this.getWebSocketUrl(rpc.url);
+            const wsUrl = this.getWebSocketUrl(rpc.httpUrl);
             const provider = new Web3.providers.WebsocketProvider(wsUrl, {
                 timeout: rpc.timeout || 5000,
                 reconnect: {
@@ -48,8 +48,8 @@ class RpcService extends EventEmitter {
                 this.updateStatus(rpc.name, true);
             });
 
-            provider.on('error', (error: Error) => {
-                logger.error(`WebSocket error for RPC ${rpc.name}:`, error.message);
+            provider.on('error', () => {
+                logger.error(`WebSocket error for RPC ${rpc.name}`);
                 this.handleConnectionError(rpc.name);
             });
 
@@ -65,7 +65,8 @@ class RpcService extends EventEmitter {
                 isActive: true,
                 lastCheck: new Date(),
                 responseTime: 0,
-                errorCount: 0
+                errorCount: 0,
+                lastBlockNumber: 0
             });
 
             logger.info(`RPC ${rpc.name} initialized with WebSocket`);
@@ -84,11 +85,11 @@ class RpcService extends EventEmitter {
                 return;
             }
 
-            // Update last successful response time
             const currentStatus = this.status.get(rpcName);
             if (currentStatus) {
                 currentStatus.lastCheck = new Date();
-                currentStatus.responseTime = 0; // Reset response time on successful block
+                currentStatus.responseTime = 0;
+                currentStatus.lastBlockNumber = blockHeader.number;
                 this.status.set(rpcName, currentStatus);
             }
 
@@ -184,7 +185,6 @@ class RpcService extends EventEmitter {
             this.checkInterval = null;
         }
 
-        // Close all WebSocket connections
         this.providers.forEach((provider, name) => {
             try {
                 provider.disconnect();

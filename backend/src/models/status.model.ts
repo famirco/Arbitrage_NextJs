@@ -1,25 +1,33 @@
-export interface SystemStatus {
-    activeRpcs: number;
-    totalRpcs: number;
-    lastUpdate: Date;
-    activeTokens: string[];
-    walletBalance: string;
-    totalTrades: number;
-    successfulTrades: number;
-    failedTrades: number;
-}
-
 export interface RpcStatus {
     isActive: boolean;
     lastCheck: Date;
     responseTime: number;
     errorCount: number;
     lastError?: string;
+    lastBlockNumber?: number;
+}
+
+export interface TradeStatus {
+    timestamp: Date;
+    buyAmount: number;
+    buyPrice: number;
+    buyRPC: string;
+    sellAmount: number;
+    sellPrice: number;
+    sellRPC: string;
+    status: 'SUCCESS' | 'FAILED';
+    buyTxHash: string;
+    sellTxHash: string;
+    profit: number;
 }
 
 export interface PriceStatus {
-    price: string;
-    timestamp: number;
-    lastUpdate: Date;
-    error?: string;
+    timestamp: Date;
+    token: string;
+    prices: {
+        [rpcName: string]: {
+            price: number;
+            lastUpdate: Date;
+        };
+    };
 }
