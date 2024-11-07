@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { configLoader } from '../utils/config.loader';
 import logger from '../utils/logger';
-import type { Settings } from '../utils/config.loader';
+import type { Settings } from '../models/settings.model';
 
 const router = Router();
 

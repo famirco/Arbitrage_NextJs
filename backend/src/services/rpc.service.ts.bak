@@ -48,8 +48,8 @@ class RpcService extends EventEmitter {
                 this.updateStatus(rpc.name, true);
             });
 
-            provider.on('error', (error: Error) => {
-                logger.error(`WebSocket error for RPC ${rpc.name}:`, error.message);
+            provider.on('error', () => {
+                logger.error(`WebSocket error for RPC ${rpc.name}:`, error);
                 this.handleConnectionError(rpc.name);
             });
 

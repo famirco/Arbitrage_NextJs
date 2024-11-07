@@ -36,7 +36,7 @@ export class TradeService extends EventEmitter {
 
         rpcs.forEach(rpc => {
             try {
-                const web3 = new Web3(rpc.url);
+                const web3 = new Web3(rpc.httpUrl);
                 if (privateKey) {
                     try {
                         const account = web3.eth.accounts.privateKeyToAccount(privateKey);
